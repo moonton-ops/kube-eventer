@@ -53,11 +53,11 @@ var (
 	}
 )
 
-var ArgDDbufferWindows time.Duration
+var ArgDDbufferWindows int
 
 func init() {
 	//dingding buffer windows
-	flag.DurationVar(&ArgDDbufferWindows, "bufferwindows", 0, "if you wanna aggregate the event's message what type is"+
+	flag.IntVar(&ArgDDbufferWindows, "bufferwindows", 0, "if you wanna aggregate the event's message what type is"+
 		" Waring in a given time windows to dingding sink, just set bufferwindows >0 ,but Sugget you set bufferwindows > 300"+
 		"(defult 0s means do not aggregate message) ")
 }
@@ -107,7 +107,12 @@ func (d *DingTalkSink) Stop() {
 	//do nothing
 }
 
+var BbufferEventBatch = core.BufferEventBatch{}
+var s = 10
+var count=0
+
 func (d *DingTalkSink) ExportEvents(batch *core.EventBatch) {
+	count=count+1
 	if ArgDDbufferWindows == 0 {
 		for _, event := range batch.Events {
 			if d.isEventLevelDangerous(event.Type) {
@@ -118,9 +123,9 @@ func (d *DingTalkSink) ExportEvents(batch *core.EventBatch) {
 		}
 	} else {
 		klog.V(2).Info( ArgDDbufferWindows, "!=0 , then Trun on dingdingtalk buffer windows.")
-		d.ExportBufferEvents(batch)
+		DumpbufferEventBatch(batch)
+		d.ExportBufferEvents(BbufferEventBatch)
 	}
-
 }
 
 func (d *DingTalkSink) isEventLevelDangerous(level string) bool {

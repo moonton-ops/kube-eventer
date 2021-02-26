@@ -15,7 +15,6 @@
 package sinks
 
 import (
-	"github.com/AliyunContainerService/kube-eventer/sinks/dingtalk"
 	"sync"
 	"time"
 
@@ -65,8 +64,8 @@ type sinkManager struct {
 }
 
 
+var dumpEventBatch =DumpEventBatch{}
 func NewEventSinkManager(sinks []core.EventSink, exportEventsTimeout, stopTimeout time.Duration) (core.EventSink, error) {
-	dumpEventBatch:=DumpEventBatch{}
 	sinkHolders := []sinkHolder{}
 	for _, sink := range sinks {
 		sh := sinkHolder{
@@ -79,9 +78,7 @@ func NewEventSinkManager(sinks []core.EventSink, exportEventsTimeout, stopTimeou
 			for {
 				select {
 				case data := <-sh.eventBatchChannel:
-					//dump into mem
-					dumpEventBatch=append(dumpEventBatch,data)
-					//export(sh.sink, data)
+					export(sh.sink, data)
 				case isStop := <-sh.stopChannel:
 					klog.V(2).Infof("Stop received: %s", sh.sink.Name())
 					if isStop {
@@ -91,20 +88,7 @@ func NewEventSinkManager(sinks []core.EventSink, exportEventsTimeout, stopTimeou
 				}
 			}
 		}(sh)
-		// create a goroutine to sleep a given time to collecter events then merge to send to sink
-		go func(){
-			for {
-				time.Sleep(dingtalk.ArgDDbufferWindows)
-				if len(dumpEventBatch) != 0 {
-					klog.V(2).Info("dumpEventBatch lenth :",len(dumpEventBatch))
-					for _, data := range(dumpEventBatch) {
-						klog.V(2).Info("start to export data to sink ")
-						export(sh.sink, data)
-					}
-					dumpEventBatch = DumpEventBatch{}
-				}
-			}
-		}()
+
 	}
 
 
@@ -114,6 +98,9 @@ func NewEventSinkManager(sinks []core.EventSink, exportEventsTimeout, stopTimeou
 		stopTimeout:         stopTimeout,
 	}, nil
 }
+
+
+
 
 // Guarantees that the export will complete in exportEventsTimeout.
 func (this *sinkManager) ExportEvents(data *core.EventBatch) {
@@ -158,7 +145,8 @@ func (this *sinkManager) Stop() {
 	}
 }
 
-// export to Eventsink ,for example dingding
+
+
 func export(s core.EventSink, data *core.EventBatch) {
 	startTime := time.Now()
 	defer func() {

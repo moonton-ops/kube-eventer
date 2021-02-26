@@ -8,37 +8,61 @@ import (
 	kube_api "k8s.io/api/core/v1"
 	"k8s.io/klog"
 	"net/http"
-	"sync"
+	"reflect"
 	"time"
 )
 
-type BufferEventBatch map[string][]*kube_api.Event
 
-func (d *DingTalkSink) ExportBufferEvents(batch *core.EventBatch) {
 
-	var wg sync.WaitGroup
-	var bufferEventBatch = BufferEventBatch{}
-	defer func() {
-		bufferEventBatch = BufferEventBatch{}
-	}()
 
+
+func DumpbufferEventBatch(batch *core.EventBatch) {
+	klog.V(2).Info("start count:",count)
+	i:=0
 	for _, event := range batch.Events {
-			// only handler Warning Buffer
-			if event.Type == "Warning" {
-				bufferEventBatch[event.InvolvedObject.Name] = append(bufferEventBatch[event.InvolvedObject.Name], event)
+		// only handler Warning Buffer
+		if event.Type == "Warning" {
+			if len(BbufferEventBatch)!=0{
+				//1.if  event.name is new then append
+				if _,contain:=BbufferEventBatch[event.InvolvedObject.Name];!contain{
+					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
+				}
+				//2.if event.name is exits ;then diff message
+				for _,ev:=range(BbufferEventBatch[event.InvolvedObject.Name]){
+					if ev.Message != event.Message{
+						i=i+1
+					}
+				}
+				if i==len(BbufferEventBatch){
+					klog.V(2).Info("i:",i)
+					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
+				}
+			}else{
+				//if lenth=0;then append
+				BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
 			}
+		}
 	}
-
-	klog.V(2).Info("NewEventBatch len:", len(bufferEventBatch))
-
-	for _, bufferEvent := range bufferEventBatch {
-		d.DingBuffer(bufferEvent)
-		// add threshold
-		time.Sleep(time.Millisecond * 50)
-	}
-
-	wg.Wait()
+	klog.V(2).Info("count:",count)
 }
+
+func (d *DingTalkSink) ExportBufferEvents(batch core.BufferEventBatch) {
+	klog.V(2).Info("BbuferEventBatch len :",len(batch))
+	if count >=ArgDDbufferWindows {
+		count =0
+		if len(BbufferEventBatch)!=0{
+			for _, bufferEvent := range BbufferEventBatch {
+				d.DingBuffer(bufferEvent)
+				// add threshold
+				time.Sleep(time.Millisecond * 50)
+			}
+			BbufferEventBatch=core.BufferEventBatch{}
+			count=0
+		}
+	}
+}
+
+
 
 func (d *DingTalkSink) DingBuffer(bufferevent []*kube_api.Event) {
 
@@ -114,4 +138,22 @@ func NewcreateMsgFromEvent(d *DingTalkSink, bufferevent []*kube_api.Event) *Ding
 	}
 
 	return msg
+}
+
+
+func Contains(obj interface{}, target interface{}) (bool, error) {
+	targetValue := reflect.ValueOf(target)
+	switch reflect.TypeOf(target).Kind() {
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < targetValue.Len(); i++ {
+			if targetValue.Index(i).Interface() == obj {
+				return true, nil
+			}
+		}
+	case reflect.Map:
+		if targetValue.MapIndex(reflect.ValueOf(obj)).IsValid() {
+			return true, nil
+		}
+	}
+	return false, nil
 }

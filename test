@@ -1,0 +1,6 @@
+array_name=(hello  world golang k8s docker)
+
+
+[ $1 == "run" ] && for i in ${array_name[@]};do kubectl run  $i --image=1 ;done
+[ $1 == "delete" ] && for i in ${array_name[@]};do kubectl delete deployment $i  ;done
+

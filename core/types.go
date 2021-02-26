@@ -73,3 +73,5 @@ type EventSink interface {
 	// Stops the sink at earliest convenience.
 	Stop()
 }
+
+type BufferEventBatch map[string][]*kube_api.Event
