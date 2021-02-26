@@ -19,7 +19,9 @@ const (
 	URL_ALIYUN_CROBJOB_TEMPLATE         = URL_ALIYUN_K8S_CONSULE + "/cronjob/detail/%s/%s/%s/%s/jobs"
 	URL_ALIYUN_SVC_TEMPLATE             = URL_ALIYUN_K8S_CONSULE + "/service/detail/%s/%s/%s/%s"
 	URL_ALIYUN_NAMESPACE_TEMPLATE       = URL_ALIYUN_K8S_CONSULE + "/namespace"
-	URL_ALIYUN_ECS_TEMPLATE             = "https://ecs.console.aliyun.com/#/server/%s/detail?regionId=%s"
+//	URL_ALIYUN_ECS_TEMPLATE             = "https://ecs.console.aliyun.com/#/server/%s/detail?regionId=%s"
+    //mutong
+    URL_ALIYUN_ECS_TEMPLATE             = "https://grafana.k8s.moonton.net/d/9CWBz0bik/1-node-exporter-for-prometheus-dashboard-cn-v20201010"
 )
 
 type MarkdownMsgBuilder struct {
@@ -116,7 +118,9 @@ func (m *MarkdownMsgBuilder) AddNodeName(nodeName string) {
 	ecsInfo := strings.Split(nodeName, ".")
 	var nodeInfo string
 	if len(ecsInfo) > 1 {
-		ecsURL := fmt.Sprintf(URL_ALIYUN_ECS_TEMPLATE, ecsInfo[1], ecsInfo[0])
+		//ecsURL := fmt.Sprintf(URL_ALIYUN_ECS_TEMPLATE, ecsInfo[1], ecsInfo[0])
+		//mutong
+		ecsURL := fmt.Sprintf(URL_ALIYUN_ECS_TEMPLATE)
 		nodeInfo = fmt.Sprintf("Node: "+MARKDOWN_LINK_TEMPLATE+" "+MARKDOWN_NEW_LINE, nodeName, ecsURL)
 	} else {
 		nodeInfo = fmt.Sprintf("Node: "+MARKDOWN_TEXT_BOLD+" "+MARKDOWN_NEW_LINE, nodeName)
