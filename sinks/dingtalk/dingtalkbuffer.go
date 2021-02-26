@@ -21,21 +21,14 @@ func (d *DingTalkSink) ExportBufferEvents(batch *core.EventBatch) {
 	defer func() {
 		bufferEventBatch = BufferEventBatch{}
 	}()
-	// dump level is error event into buffer
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for _, event := range batch.Events {
+
+	for _, event := range batch.Events {
 			// only handler Warning Buffer
 			if event.Type == "Warning" {
 				bufferEventBatch[event.InvolvedObject.Name] = append(bufferEventBatch[event.InvolvedObject.Name], event)
 			}
-		}
-	}()
+	}
 
-	//buffer windows
-	klog.V(2).Info("dingding buffer windows is ", ArgDDbufferWindows)
-	time.Sleep(ArgDDbufferWindows)
 	klog.V(2).Info("NewEventBatch len:", len(bufferEventBatch))
 
 	for _, bufferEvent := range bufferEventBatch {

@@ -117,7 +117,7 @@ func (d *DingTalkSink) ExportEvents(batch *core.EventBatch) {
 			}
 		}
 	} else {
-		klog.V(2).Info("ArgDDbufferWindows value is ", ArgDDbufferWindows, "!=0 , then Trun on dingdingtalk buffer windows.")
+		klog.V(2).Info( ArgDDbufferWindows, "!=0 , then Trun on dingdingtalk buffer windows.")
 		d.ExportBufferEvents(batch)
 	}
 
