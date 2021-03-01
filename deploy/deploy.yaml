@@ -22,7 +22,7 @@ spec:
       nodeSelector:
         type: eventer
       containers:
-        - image: harbor.k8s.moonton.net/operator/kube-eventer-amd64:v2
+        - image: harbor.k8s.moonton.net/operator/kube-eventer-amd64:v4
           name: kube-eventer
           command:
             - "/kube-eventer"

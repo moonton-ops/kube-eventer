@@ -19,6 +19,7 @@ import (
 func DumpbufferEventBatch(batch *core.EventBatch) {
 	klog.V(2).Info("start count:",count)
 	i:=0
+        j:=0
 	for _, event := range batch.Events {
 		// only handler Warning Buffer
 		if event.Type == "Warning" {
@@ -30,15 +31,18 @@ func DumpbufferEventBatch(batch *core.EventBatch) {
 				}
 				//2.if event.name is exits ;then diff message
 				for _,ev:=range(BbufferEventBatch[event.InvolvedObject.Name]){
+					j=j+1
 					if ev.Message != event.Message{
 						i=i+1
 					}
 				}
-				if i==len(BbufferEventBatch){
-					klog.V(2).Info("i:",i,"BbufferEventBatch leth: ",len(BbufferEventBatch))
+				if i==j{
+					klog.V(2).Info("i:",i,"BbufferEventBatch leth: ",len(BbufferEventBatch),"j:->",j)
+					klog.V(2).Info("map[name]events:",BbufferEventBatch[event.InvolvedObject.Name], "add events:",event)
 					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
 				}
 				i=0
+				j=0
 			}else{
 				//if lenth=0;then append
 				BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
