@@ -37,8 +37,7 @@ func DumpbufferEventBatch(batch *core.EventBatch) {
 					}
 				}
 				if i==j{
-					klog.V(2).Info("i:",i,"BbufferEventBatch leth: ",len(BbufferEventBatch),"j:->",j)
-					klog.V(2).Info("map[name]events:",BbufferEventBatch[event.InvolvedObject.Name], "add events:",event)
+					klog.V(2).Info("i:",i,"j:",j)
 					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
 				}
 				i=0
