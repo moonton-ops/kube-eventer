@@ -26,6 +26,7 @@ func DumpbufferEventBatch(batch *core.EventBatch) {
 				//1.if  event.name is new then append
 				if _,contain:=BbufferEventBatch[event.InvolvedObject.Name];!contain{
 					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
+					continue
 				}
 				//2.if event.name is exits ;then diff message
 				for _,ev:=range(BbufferEventBatch[event.InvolvedObject.Name]){
@@ -34,9 +35,10 @@ func DumpbufferEventBatch(batch *core.EventBatch) {
 					}
 				}
 				if i==len(BbufferEventBatch){
-					klog.V(2).Info("i:",i)
+					klog.V(2).Info("i:",i,"BbufferEventBatch leth: ",len(BbufferEventBatch))
 					BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
 				}
+				i=0
 			}else{
 				//if lenth=0;then append
 				BbufferEventBatch[event.InvolvedObject.Name] = append(BbufferEventBatch[event.InvolvedObject.Name], event)
