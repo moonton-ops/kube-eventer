@@ -19,16 +19,18 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       serviceAccount: kube-eventer
+      nodeSelector:
+        type: eventer
       containers:
-        - image: registry.aliyuncs.com/acs/kube-eventer-amd64:v1.2.0-19808a6-aliyun
+        - image: harbor.k8s.moonton.net/operator/mutong-eventer-amd64:v1.2.0
           name: kube-eventer
           command:
             - "/kube-eventer"
             - "--source=kubernetes:https://kubernetes.default"
             - --frequency=10s
-            - --bufferwindows=150s
+            - --bufferwindows=3
             - --v=2
-            - --sink=dingtalk:https://oapi.dingtalk.com/robot/send?access_token=3ab0e2d0a7fda667e2ed8a36143a5233c45a2aadc9d3d70e8aebd88c6863d10b&level=Warning&msg_type=markdown
+            - --sink=dingtalk:https://oapi.dingtalk.com/robot/send?access_token=9097668119105d47c33e86c67a9ac709496739a7f7dea3b6a7e46c4f88d29a6d&level=Warning&msg_type=markdown
           env:
           # If TZ is assigned, set the TZ value as the time zone
           - name: TZ

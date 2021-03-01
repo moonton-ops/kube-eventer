@@ -57,9 +57,8 @@ var ArgDDbufferWindows int
 
 func init() {
 	//dingding buffer windows
-	flag.IntVar(&ArgDDbufferWindows, "bufferwindows", 0, "if you wanna aggregate the event's message what type is"+
-		" Waring in a given time windows to dingding sink, just set bufferwindows >0 ,but Sugget you set bufferwindows > 300"+
-		"(defult 0s means do not aggregate message) ")
+	flag.IntVar(&ArgDDbufferWindows, "bufferwindows", 0, "聚合创建时间=frequency*bufferwindows,比如 frequency=10s ,bufferwindows=6,即表示聚合这60s内的信息"+
+		"(defult 0 means do not aggregate message) ")
 }
 
 /**
