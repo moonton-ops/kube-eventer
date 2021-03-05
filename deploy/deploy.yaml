@@ -1,10 +1,5 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata:
-  labels:
-    name: kube-eventer
-  name: kube-eventer
-  namespace: monitoring
 spec:
   replicas: 1
   selector:
@@ -30,7 +25,7 @@ spec:
             - --frequency=10s
             - --bufferwindows=20
             - --v=2
-            - --sink=dingtalk:https://oapi.dingtalk.com/robot/send?access_token=9097668119105d47c33e86c67a9ac709496739a7f7dea3b6a7e46c4f88d29a6d&level=Warning&msg_type=markdown
+            - --sink=dingtalk:https://oapi.dingtalk.com/robot/send?XXX&level=Warning&msg_type=markdown
           env:
           # If TZ is assigned, set the TZ value as the time zone
           - name: TZ
